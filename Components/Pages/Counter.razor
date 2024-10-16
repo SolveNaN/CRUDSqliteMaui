@@ -1,0 +1,100 @@
+﻿@page "/counter"
+@inject MovimientoService MovimientoService
+
+<h1>Movimientos</h1>
+
+<p>This component demonstrates showing data.</p>
+Editar Movimiento
+<br />
+<label>Nombre</label>
+<input type="text" @bind-value=mimovimiento.Nombre class="form-control" />
+<label>Tipo</label>
+<select @bind=mimovimiento.Tipo class="form-select" aria-label="Default select example">
+    <option selected>Tipo</option>
+    <option value="Ingreso">Ingreso</option>
+    <option value="Egreso">Egreso</option>
+</select>
+<label>Valor</label>
+<input type="number" @bind-value=mimovimiento.Valor class="form-control" />
+<br />
+<button class="btn btn-primary" @onclick="EditarMovimiento">Editar Movimiento</button>
+<button class="btn btn-warning" @onclick="EliminarMovimiento">Eliminar Movimiento</button>
+@if (Movimientos == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Valor</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movimiento in Movimientos)
+            {
+                <tr>
+                    <td>@movimiento.Nombre</td>
+                    <td>@movimiento.Valor</td>
+                    <td>@movimiento.Tipo</td>
+                    <td>@movimiento.Fecha</td>
+                    <td>
+                        <button class="btn btn-outline-info" @onclick="()=>Asignal(movimiento)">Asignar Movimiento</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public static List<Movimiento> Movimientos = new List<Movimiento>();
+
+    Movimiento mimovimiento = new Movimiento();
+    private WeatherForecast[]? forecasts;
+
+    public async Task EditarMovimiento()
+    {
+        await MovimientoService.UpdateMovimientoAsync(mimovimiento);
+    }
+
+    public async Task EliminarMovimiento()
+    {
+        await MovimientoService.DeleteMovimientoAsync(mimovimiento.Id);
+    }
+
+    void Asignal(Movimiento objeto)
+    {
+        mimovimiento = objeto;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        Movimientos = await MovimientoService.GetMovimientosAsync();
+
+        // Simulate asynchronous loading to demonstrate a loading indicator
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = startDate.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = summaries[Random.Shared.Next(summaries.Length)]
+            }).ToArray();
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}

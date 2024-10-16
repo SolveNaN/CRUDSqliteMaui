@@ -1,0 +1,25 @@
+﻿@page "/"
+@inject MovimientoService MovimientoService
+<h1>Hello, world!</h1>
+
+Nuevo Movimiento
+<br />
+<label>Nombre</label>
+<input type="text" @bind-value=mimovimiento.Nombre class="form-control"/>
+<label>Tipo</label>
+<select @bind=mimovimiento.Tipo class="form-select" aria-label="Default select example">
+    <option selected>Tipo</option>
+    <option value="Ingreso">Ingreso</option>
+    <option value="Egreso">Egreso</option>
+</select>
+<label>Valor</label>
+<input type="number" @bind-value=mimovimiento.Valor class="form-control" />
+<button class="btn btn-primary" @onclick="CrearMovimiento">Crear Movimiento</button>
+@code{
+    Movimiento mimovimiento = new Movimiento();
+
+    public async Task CrearMovimiento()
+    {
+        await MovimientoService.AddMovimientoAsync(mimovimiento);
+    }
+}
